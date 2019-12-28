@@ -1,0 +1,29 @@
+type Question @model @versioned {
+  id: ID!
+  text: String!
+  tags: [String]
+  links: [String]
+  explanation: String
+  answers: [Answer] @connection(name: "QuestionChoices")
+}
+
+type Answer @model @versioned {
+  id: ID!
+  text: String
+  correct: Boolean
+  question: Question @connection(name: "QuestionChoices")
+}
+
+type Quiz @model(queries: {list: "listQuizzes", get: "getQuiz"}) @versioned
+  @auth(
+    rules: [
+      {allow: groups, groups: ["instructors"]}
+      { allow: groups, groups: ["students"], 
+        mutations: [], queries: [get, list] }
+    ]
+  )
+ {
+  id: ID!
+  title: String!
+  questions: [Question] @connection
+}
